@@ -1,0 +1,175 @@
+<div style="padding: 15px;width:600px;">
+        <form class="layui-form" action="">
+          <input type="hidden" name="brand_logo" id="brand_logo_url">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">名称</label>
+                  <div class="layui-input-block">
+                    <input type="text" name="brand_name" required lay-verify="required|checkName"  placeholder="品牌名称" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">品牌网址</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="brand_url" required lay-verify="required|url|checkUrl" placeholder="链接" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">LoGo</label>
+                  <div class="layui-input-inline">
+                      <button type="button" class="layui-btn layui-btn-danger" id="brand_logo"><i class="layui-icon"></i>上传图片</button>
+                      <div class="layui-inline layui-word-aux">
+                  </div>
+                  </div>
+                </div>
+                <!--<div class="layui-form-item layui-form-text">-->
+                  <!--<label class="layui-form-label">描述</label>-->
+                  <!--<div class="layui-input-block">-->
+                    <!--<textarea name="brand_desc" placeholder="请输入内容" lay-verify="required"  class="layui-textarea"></textarea>-->
+                  <!--</div>-->
+                <!--</div>-->
+                <div class="layui-form-item">
+                  <label class="layui-form-label">是否展示</label>
+                  <div class="layui-input-block">
+                    <input type="radio" name="brand_show" lay-filter="radio" lay-verify="required" value="1" title="是">
+                    <input type="radio" name="brand_show" lay-filter="radio" lay-verify="required" value="2" title="否" checked>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+              </form>
+    </div>
+<script>
+    $(function(){
+      //Demo
+      layui.use(['form','upload','layer'], function(){
+        var form = layui.form;
+        var upload = layui.upload;
+        var layer = layui.layer;
+
+        // 验证
+        form.verify({
+          // 验证用户名
+          checkName: function(value, item){ //value：表单的值、item：表单的DOM对象
+            // 验证格式
+            var reg = /^([\u4e00-\u9fa5]|[a-z0-9]){2,10}$/i;
+            if(!reg.test(value)){
+              return '品牌名称汉字、字母、数字2-10位';
+            }else{  // 验证唯一性
+              var name_flag;
+              $.ajax({
+                type:'post',
+                url:"{:url('Brand/checkName')}",
+                data:{brand_name:value,type:1},
+                async:false
+              }).done(function(res){
+                  // console.log(res);
+                  if(res == 'no'){
+                    name_flag = '品牌名称已存在'
+                  }else{
+                    name_flag = '';
+                  }
+              });
+
+              if(name_flag != ''){
+                return name_flag;
+              }
+            }
+          },
+
+          // 验证品牌网址
+          checkUrl: function(value, item){ //value：表单的值、item：表单的DOM对象
+             // 验证唯一性
+             var url_name;
+              $.ajax({
+                type:'post',
+                url:"{:url('Brand/checkUrl')}",
+                data:{brand_url:value,type:1},
+                async:false
+              }).done(function(res){
+                  // console.log(res);
+                  if(res == 'no'){
+                    url_name = '品牌网址已存在';
+                  }else{
+                    url_name = '';
+                  }
+              });
+
+              if(url_name != ''){
+                  return url_name;
+              }
+            }
+
+
+        });
+
+
+        //文件上传
+        var uploadInst = upload.render({
+        elem: '#brand_logo', //绑定元素
+        url: "{:url('Brand/brandLogoUpload')}", //上传接口
+        size: 1024,
+        accept:'images',
+        done: function(res){
+          //上传完毕回调
+          // console.log(res);
+          layer.msg(res.font,{icon:res.code,time:3000},function(){
+            $('#brand_logo_url').val(res.src);
+          });
+        },
+        error: function(res){
+          // console.log('异常');
+          layer.msg(res.font,{icon:res.code});
+          //请求异常回调
+        }
+        });
+
+        // 监听单选提交
+        form.on('radio(radio)', function(data){
+          console.log(data.elem); //得到radio原始DOM对象
+          console.log(data.value); //被点击的radio的value值
+        }); 
+
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            // console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+            $.post(
+              "{:url('Brand/brandAdd')}",
+              data.field,
+              function(res){
+                // console.log(res);
+                if(res.code == 5){
+                  layer.msg(res.font,{icon:res.code});
+                }else{
+                    layer.open({
+                      content: '请选择操作的内容',   //框内容
+                      btn: ['继续添加', '前往列表展示'],
+                      yes: function(index, layero){
+                        //按钮【按钮一】的回调
+                      window.location.href="{:url('Brand/brandAdd')}";
+                      },
+                      btn2: function(index, layero){
+                        //按钮【按钮二】的回调
+                        window.location.href="{:url('Brand/brandList')}";
+                        //return false 开启该代码可禁止点击该按钮关闭
+                      },
+                      cancel: function(){ 
+                        //右上角关闭回调
+                        
+                        //return false 开启该代码可禁止点击该按钮关闭
+                      }
+                    });
+                  }
+              },
+              'json'
+            );
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+          });
+
+      });
+
+    });
+</script>

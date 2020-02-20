@@ -1,0 +1,273 @@
+<script type="text/javascript" src="__STATIC__/index/js/n_nav.js"></script>
+{include file="public/nav" /}
+
+<div class="i_bg">
+	<div class="postion">
+    	<span class="fl">全部 > 美妆个护 > 香水 > </span>
+        <span class="n_ch" style="display: none;" id="brand">
+            <span class="fl">品牌：<font id="brandDiv"></font></span>
+            <a href="javascript:;"><img id="brandDel" src="__STATIC__/index/images/s_close.gif" /></a>
+        </span>
+        <span class="n_ch" style="display: none;" id="price">
+            <span class="fl">价格：<font id="priceDiv"></font></span>
+            <a href="javascript:;"><img id="priceDel" src="__STATIC__/index/images/s_close.gif" /></a>
+        </span>
+    </div>
+    <!--Begin 筛选条件 Begin-->
+    <div class="content mar_10">
+    	<table border="0" class="choice" style="width:100%; font-family:'宋体'; margin:0 auto;" cellspacing="0" cellpadding="0">
+          <tr valign="top">
+            <td width="70">&nbsp; 品牌：</td>
+            <td class="td_a">
+                {volist name="brandInfo" id="v"}
+                <a href="javascript:;" class="brand">{$v.brand_name}</a>
+                {/volist}
+            </td>
+          </tr>
+          <tr valign="top">
+            <td>&nbsp; 价格：</td>                                                                                                       
+            <td class="td_a" id="td_a">
+                {volist name="priceInfo" id="v"}
+                <a href="javascript:;" class="price">{$v}</a>
+                {/volist}
+            </td>
+          </tr>
+        </table>                                                                                 
+    </div>
+    <!--End 筛选条件 End-->
+    
+    <div class="content mar_20">
+    	<div class="l_history">
+        	<div class="his_t">
+            	<span class="fl">浏览历史</span>
+                <span class="fr"><a href="javascript:;">清空</a></span>
+            </div>
+        	<ul>
+                {volist name="historyInfo" id="v"}
+            	<li>
+                    <div class="img">
+                        <a href="javascript:;">
+                            <img src="__STATIC__/../uploads/goodsimgs/{$v.goods_img}" width="185" height="162" />
+                        </a>
+                    </div>
+                	<div class="name"><a href="javascript:;">{$v.goods_name}</a></div>
+                    <div class="price">
+                    	<font>￥<span>{$v.self_price}</span></font> &nbsp; {$v.goods_score}R
+                    </div>
+                </li>
+                {/volist}
+        	</ul>
+        </div>
+        <div class="l_list" >
+        	<div class="list_t">
+            	<span class="fl list_or">
+                	<a href="javascript:;" a_type="1" class="default now" p="1">默认</a>
+                    <a href="javascript:;" a_type="2" class="default"  p="1" field="goods_num">
+                    	<span class="fl">库存</span>
+                        <span>↑</span>
+                    </a>
+                    <a href="javascript:;" a_type="2" class="default"  p="1" field="self_price">
+                    	<span class="fl">价格</span>                        
+                        <span>↑</span>
+                    </a>
+                    <a href="javascript:;" a_type="3" class="default"  p="1" field="is_new">新品</a>
+                </span>
+                <span class="fr">共发现{$count}件</span>
+            </div>
+            <!--商品信息 start-->
+            <div class="list_c" id="goodsInfo">
+                <ul class="cate_list">
+                    {volist name="goodsInfo" id="v"}
+                    <input type="hidden" class="goods_id" value="{$v.goods_id}">
+                	<li>
+                    	<div class="img">
+                            <a href="{:url('Goods/goodsDetail')}?goods_id={$v.goods_id}">
+                                <img src="__STATIC__/../uploads/goodsimgs/{$v.goods_img}" width="210" height="185" />
+                            </a>
+                        </div>
+                        <div class="price">
+                            <font>￥<span>{$v.self_price}</span></font> &nbsp; {$v.goods_score}R
+                        </div>
+                        <div class="name">
+                            <a href="{:url('Goods/goodsDetail')}?goods_id={$v.goods_id}">{$v.goods_name}</a></div>
+                        <div class="carbg">
+                        	<a href="javascript:;" class="ss">收藏</a>
+                            <a href="javascript:;" class="j_car">加入购物车</a>
+                        </div>
+                    </li>
+                    {/volist}
+                </ul>
+                <div class="pages">
+                    {$str}
+                </div>
+            </div>
+            <!--商品信息 end-->
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+            // 品牌点击
+            $(document).on('click','.brand',function(){
+                var _this = $(this);
+                // 1、把当前点击的颜色改为红色
+                _this.addClass('now');
+                _this.siblings('a').removeClass('now');
+                var brand_name = _this.text();
+
+                // 2、面包屑后的品牌名称发生改变
+                $('#brand').show();
+                $('#brand').find('font').text(brand_name);
+
+                // 3.品牌名称更改时清除价格颜色和显示
+                $('#price').hide();
+                $('.price').removeClass('now');
+
+                // 4.重新获取价格
+                getPriceInfo();
+
+                // 5.重新获取商品和分页
+                var _this = $(this);
+                var p = _this.attr('p');
+                getGoodsInfo(p);
+
+            });
+
+            // 品牌点击筛选删除
+            $(document).on('click','#brandDel',function(){
+                // alert(1);
+                $(this).parents("span[id='brand']").hide();
+                $("a[class ='brand now']").removeClass('now');
+                $("#brandDiv").empty();
+
+                // 重新获取价格
+                getPriceInfo();
+
+                // 重新获取商品
+                getGoodsInfo();
+            });
+
+            // 价格点击
+            $(document).on('click','.price',function(){
+                var _this = $(this);
+                // 1、把当前点击的颜色改为红色
+                _this.addClass('now');
+                _this.siblings('a').removeClass('now');
+                var price = _this.text();
+
+                // 2、面包屑后的价格发生改变
+                $('#price').show();
+                $('#price').find('font').text(price);
+
+                // 3.重新获取商品和分页
+                var _this = $(this);
+                var p = _this.attr('p');
+                getGoodsInfo(p);
+
+            });
+
+            // 价格点击筛选删除
+            $(document).on('click','#priceDel',function(){
+                $(this).parents("span[id='price']").hide();
+                $("a[class ='price now']").removeClass('now');
+                $("#priceDiv").empty();
+
+                // 重新获取商品
+                getGoodsInfo();
+            });
+
+            // 默认点击
+            $(document).on('click','.default',function(){
+                var _this = $(this);
+                // 1、把当前点击的颜色改为红色
+                _this.addClass('now');
+                _this.siblings('a').removeClass('now');
+
+                // 2.重新获取商品和分页
+                var _this = $(this);
+                var p = _this.attr('p');
+                getGoodsInfo(p);
+
+            });
+
+            // 点击分页
+            $(document).on('click','.page',function(){
+                var _this = $(this);
+                var p = _this.attr('p');
+                // 重新获取商品和分页
+                getGoodsInfo(p);
+            })
+
+            // 获取商品信息和分页
+            function getGoodsInfo(p){
+                // 获取品牌 价格 默认和页数
+                var brand_name = $('#brandDiv').text();
+                var price = $('#priceDiv').text();
+                // console.log(brand_name);
+                // console.log(price);
+                var _default = $("a[class='default now']");
+                var a_type = _default.attr('a_type');
+                if(a_type == 1){
+                    var field = 'goods_num';
+                    var order = 'desc';
+                }else if(a_type == 2){
+                    var field = _default.attr('field');
+                    var _text = _default.children().last().text();
+                    if(_text == '↑'){
+                        var order = 'asc';
+                        _default.children().last().text('↓');
+                    }else{
+                        var order = 'desc';
+                        _default.children().last().text('↑');
+                    }
+                }else{
+                    var field = _default.attr('field');
+                }
+                // console.log(field);
+                // console.log(order);
+                $.post(
+                    "{:url('Goods/getGoodsInfo')}",
+                    {p:p,brand_name:brand_name,price:price,field:field,order:order},
+                    function(res){
+                        // console.log(res);
+                       $("#goodsInfo").html(res);
+                    }
+                );
+            }
+
+            // 重新获取价格
+            function getPriceInfo(){
+                var brand_name = $('#brandDiv').text();
+                // console.log(brand_name);
+                $.post(
+                    "{:url('Goods/getPriceInfo')}",
+                    {brand_name:brand_name},
+                    function(res){
+                        // console.log(res);
+                        var _a = '';
+                        for(var i in res){
+                            _a+='<a href="javascript:;" class="price">'+res[i]+'</a>';
+                        }
+                        $("#td_a").html(_a);
+                    },
+                    'json'
+                );
+            }
+
+            // 加入购物车
+            $('.j_car').click(function(){
+                var goods_id = $(this).parents('li').prev().val();
+                // console.log(goods_id);
+                $.post(
+                    "{:url('Cart/cartAdd')}",
+                    {goods_id:goods_id,buy_number:1},
+                    function(res){
+                        // console.log(res);
+                        layer.msg(res.font,{icon:res.code});
+                    },
+                    'json'
+                );
+            });
+        });
+    </script>
+  

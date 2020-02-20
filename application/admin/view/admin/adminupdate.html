@@ -1,0 +1,98 @@
+<div style="padding: 15px;width:600px;">
+    <form class="layui-form" action="">
+        <input type="hidden" name="admin_id" id="admin_id" value="{$adminInfo.admin_id}">
+            <div class="layui-form-item">
+              <label class="layui-form-label">管理员名称</label>
+              <div class="layui-input-block">
+                <input type="text" name="admin_name" lay-verify="required|checkName" value="{$adminInfo.admin_name}" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-block">
+                    <input type="text" name="admin_email"   lay-verify="required|email"  value="{$adminInfo.admin_email}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">电话</label>
+                <div class="layui-input-block">
+                    <input type="text" name="admin_tel"  lay-verify="required|phone"  value="{$adminInfo.admin_tel}"  autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              </div>
+            </div>
+          </form>
+           
+          <script>
+      $(function(){
+        layui.use(['form','layer'], function(){
+        var form = layui.form;
+        var layer = layui.layer;
+
+           // 验证
+          form.verify({
+            // 用户名
+            checkName: function(value, item){ //value：表单的值、item：表单的DOM对象
+                var reg = /^[a-z_]\w{3,11}$/i;
+                if(!reg.test(value)){
+                  return '管理员名称数字、字母、下划线非数字开头4-12位';
+                }else{
+                    var name_flag;
+                    // 第一步
+                    $.ajax({
+                      type:'POST',
+                      url:"{:url('Admin/checkName')}",
+                      data:{admin_name:value,type:2,admin_id:$('#admin_id').val()},
+                      async:false
+                    }).done(function(result){
+                    //   console.log(result);
+                        if(result == 'no'){
+                          name_flag = '管理员名称已存在';
+                        }else{
+                          name_flag ='';
+                        }
+                    })
+
+                    // 第二步
+                    if(name_flag!=''){
+                      return name_flag;
+                    }
+                  }
+              },
+
+          })
+
+            // 获取表单数据
+            
+            form.on('submit(formDemo)', function(data){
+              // console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+              $.post(
+                "{:url('Admin/adminUpdateDo')}",
+                data.field,
+                function(res){
+                //   console.log(res);
+                   
+                  if(res.code == 6){
+                    layer.msg(res.font, {icon: res.code,time:2000},function(){
+                      location.href="{:url('Admin/adminList')}";
+                    }); 
+                  }else{
+                     layer.msg(res.font, {icon: res.code}); 
+                  }
+                },
+                'json'
+              )
+              return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            });
+
+          });
+
+        });
+          
+          </script>
+</div>
+

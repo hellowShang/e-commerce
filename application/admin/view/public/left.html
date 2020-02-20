@@ -1,0 +1,44 @@
+  <!-- 左侧 -->
+  <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+          <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+          <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+              <!--  layui-nav-itemed -->
+            <li class="layui-nav-item">
+              <a class="" href="javascript:;">品牌管理</a>
+              <dl class="layui-nav-child">
+                <dd><a href="{:url('Brand/brandAdd')}">品牌添加</a></dd>
+                <dd><a href="{:url('Brand/brandList')}">品牌列表</a></dd>
+              </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a class="" href="javascript:;">分类管理</a>
+                <dl class="layui-nav-child">
+                  <dd><a href="{:url('Category/categoryAdd')}">分类添加</a></dd>
+                  <dd><a href="{:url('Category/categoryList')}">分类列表</a></dd>
+                </dl>
+              </li>
+              <li class="layui-nav-item">
+                  <a class="" href="javascript:;">商品管理</a>
+                  <dl class="layui-nav-child">
+                    <dd><a href="{:url('Goods/goodsAdd')}">商品添加</a></dd>
+                    <dd><a href="{:url('Goods/goodsList')}">商品列表</a></dd>
+                  </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a class="" href="javascript:;">管理员管理</a>
+                    <dl class="layui-nav-child">
+                      <dd><a href="{:url('Admin/adminAdd')}">管理员添加</a></dd>
+                      <dd><a href="{:url('Admin/adminList')}">管理员列表</a></dd>
+                    </dl>
+                  </li>
+                  <li class="layui-nav-item">
+                    <a class="" href="javascript:;">文章管理</a>
+                    <dl class="layui-nav-child">
+                      <dd><a href="{:url('Article/articleAdd')}">文章添加</a></dd>
+                      <dd><a href="{:url('Article/articleList')}">文章列表</a></dd>
+                    </dl>
+                  </li>
+          </ul>
+        </div>
+      </div>

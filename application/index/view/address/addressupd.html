@@ -1,0 +1,155 @@
+{include file="public/top" /}
+<!--End Header End--> 
+<div class="i_bg bg_color">
+    <!--Begin 用户中心 Begin -->
+	<div class="m_content">
+        {include file="public/left" /}
+		<div class="m_right" >
+
+            <div class="mem_tit">修改收货地址</div>
+            <table border="0" class="add_tab" style="width:930px;"  cellspacing="0" cellpadding="0">
+                <input type="hidden" id="address_id" value="{$addressInfo.address_id}">
+                <tr>
+                    <td align="right">收货人姓名</td>
+                    <td style="font-family:'宋体';">
+                        <input type="text" id="address_name" value="{$addressInfo.address_name}" class="add_ipt" />（必填）
+                    </td>
+                    <td align="right">联系方式</td>
+                    <td style="font-family:'宋体';">
+                        <input type="text" id="address_tel"  value="{$addressInfo.address_tel}" class="add_ipt" />
+                        （必填）</td>
+                </tr>
+                <tr>
+                    <td width="135" align="right">配送地区</td>
+                    <td colspan="3" style="font-family:'宋体';">
+                        <select class="qq" id="province">
+                            <option value="" selected="selected">--请选择--</option>
+                            {volist name="province" id="v"}
+                                {if condition="$addressInfo['province'] eq $v['id']"}
+                                    <option value="{$v.id}" selected>{$v.name}</option>
+                                {else /}
+                                    <option value="{$v.id}">{$v.name}</option>
+                                {/if}
+                            {/volist}
+                        </select>
+                        <select class="qq" id="city">
+                            <option value="" selected="selected">--请选择--</option>
+                            {volist name="cityInfo" id="v"}
+                                {if condition="($addressInfo['city'] eq $v['id'])"}
+                                    <option value="{$v.id}" selected>{$v.name}</option>
+                                {else /}
+                                    <option value="{$v.id}">{$v.name}</option>
+                                {/if}
+                            {/volist}
+                        </select>
+                        <select class="qq" id="area">
+                            <option value="" selected="selected">--请选择--</option>
+                            {volist name="areaInfo" id="v"}
+                                {if condition="($addressInfo['area'] eq $v['id'])"}
+                                    <option value="{$v.id}" selected>{$v.name}</option>
+                                {else /}
+                                    <option value="{$v.id}">{$v.name}</option>
+                                {/if}
+                            {/volist}
+                        </select>
+                        （必填）
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">详细地址</td>
+                    <td style="font-family:'宋体';">
+                        <input type="text" id="address_add" value="{$addressInfo.address_add}" class="add_ipt" />（必填）
+                    </td>
+                    <td align="right">邮政编码</td>
+                    <td style="font-family:'宋体';">
+                        <input type="text" id="address_mail" value="{$addressInfo.address_mail}" class="add_ipt" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" align="right">
+                        {if condition='$addressInfo["is_default"] eq 1'}
+                            <label><input type="checkbox" checked >是否设置成为默认地址</label>
+                        {else/}
+                            <label><input type="checkbox">是否设置成为默认地址</label>
+                        {/if}
+                    </td>
+                </tr>
+            </table>
+           	<p align="right">
+            	<a href="javascript:;" class="add_b">完成</a>
+            </p>
+           
+        </div>
+    </div>
+	<!--End 用户中心 End-->
+</div>
+<script>
+    $(function(){
+        layui.use('layer',function(){
+            var layer = layui.layer;
+
+            // 下拉菜单的三级联动
+            $(document).on('change','.qq',function(){
+                var _this = $(this);
+                var id = _this.val();
+                var _option = "<option value=''>--请选择--</option>";
+                _this.nextAll().html(_option);
+                $.post(
+                    "{:url('Address/getArea')}",
+                    {id:id},
+                    function(res){
+                        // console.log(res);
+                        if(res.code == 6){
+                            for(var i in res['areaInfo']){
+                                _option += "<option value='"+res['areaInfo'][i]['id']+"'>"+res['areaInfo'][i]['name']+"</option>";
+                            }
+                            _this.next().html(_option);
+                        }else{
+                            layer.msg(res.font,{icon:res.code});
+                        }
+                    },
+                    'json'
+                );
+            });
+
+            // 修改收货地址数据提交
+            $(document).on('click','.add_b',function(){
+                // 获取所有数据提交给控制器
+                var obj ={};
+                obj.address_name = $('#address_name').val();
+                obj.address_tel = $('#address_tel').val();
+                obj.province = $('#province').val();
+                obj.city = $('#city').val();
+                obj.area = $('#area').val();
+                obj.address_add = $('#address_add').val();
+                obj.address_mail = $('#address_mail').val();
+                obj.address_id = $('#address_id').val();
+
+
+                // 检测是否设置为默认地址
+                var is_default = $(':checkbox').prop('checked');
+                if(is_default == true){
+                    obj.is_default = 1;
+                }else{
+                    obj.is_default = 2;
+                }
+                // console.log(obj);
+                $.post(
+                    "{:url('Address/addressUpd')}",
+                    obj,
+                    function(res){
+                        // console.log(res);
+                        if(res.code == 6){
+                            layer.msg(res.font,{icon:res.code},function(){
+                                location.href="{:url('Address/address')}";
+                            });
+                        }else{
+                            layer.msg(res.font,{icon:res.code});
+                        }
+                    },
+                    'json'
+                );
+            });
+        });
+    });
+</script>

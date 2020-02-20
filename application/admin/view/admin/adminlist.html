@@ -1,0 +1,108 @@
+
+<div style="padding: 15px;">
+    <div class="layui-form-item">
+      <div class="layui-input-block" style="width:200px;float:left;padding: 0px;margin:0px;">
+        <input type="text" id="admin_name" placeholder="请输入管理员名称的关键字" autocomplete="off" class="layui-input">
+      </div>
+      <div class="layui-input-block" style="float:left;padding: 0px;margin:0px 0px 0px 20px;">
+          <button class="layui-btn" lay-submit  id="sear">搜索</button>
+          <button class="layui-btn" lay-submit><a style="color:#fff;" href="{:url('Admin/adminList')}">管理员列表</a></button>
+      </div>
+    </div>
+    <table id="demo" lay-filter="test"></table>
+</div>    
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+   
+   <script>
+     $(function(){
+        // 数据展示
+        layui.use(['table','layer'], function(){
+          var table = layui.table;
+          var layer = layui.layer;
+                // 表格展示
+                table.render({
+                  elem: '#demo',  // 绑定容器
+                  
+                  url: "{:url('Admin/adminInfo')}",
+                  limit: 5,  //每页显示条数
+                  limits:[2,3,5,10,20], //每页条数可选项
+                  page: true, //开启分页
+                  cols: [[ //表头
+                    {field: 'admin_id', title: 'ID',align:'center'},
+                    {field: 'admin_name', title: '管理员名称',align:'center', edit: 'text'},
+                    {field: 'admin_email', title: '邮箱', align:'center',edit: 'text'},
+                    {field: 'admin_tel', title: '手机号',align:'center',edit: 'text'},
+                    {field: 'create_time', title: '添加时间',align:'center'},
+                    {field: 'update_time', title: '修改时间',align:'center'},
+                    {field: 'barDemo', title: '操作',toolbar: '#barDemo',align:'center'}
+                      ]]
+                  });
+
+                  // 搜索
+                  $('#sear').click(function(){
+                      if($('#admin_name').val() == ''){
+                          layer.msg('搜索管理员名称必填',{icon:5})
+                          return false;
+                      }
+                      // 表格重载
+                      table.reload('demo',{
+                            where: { //设定异步数据接口的额外参数，任意设
+                              admin_name: $('#admin_name').val()
+                            },
+                            page: {
+                              curr: 1 //重新从第 1 页开始
+                            }
+                      });
+                  });
+                  
+                  //监听单元格编辑--即点即改
+                  table.on('edit(test)', function(obj){
+                      var value = obj.value //得到修改后的值
+                          ,admin_id = obj.data.admin_id //得到所在行id
+                          ,field = obj.field; //得到字段
+
+                          // 传值
+                          $.post(
+                           "{:url('Admin/adminEdit')}",
+                           {value:value,admin_id:admin_id,field:field},
+                           function(res){
+                            //  console.log(res);
+                            layer.msg(res.font,{icon:res.code,time: 2000},function(){
+                              table.reload('demo');
+                            });
+                            // 表格重载
+                          },
+                           'json'
+                         )
+                  });
+          
+                  // 监听行工具事件--删除、修改
+                  table.on('tool(test)', function(obj){
+                    var admin_id = obj.data.admin_id;
+                    var _event = obj.event;
+                    // console.log(admin_id);
+                    // console.log(_event);
+                    if(_event == 'del'){
+                      layer.confirm('是否确认删除?', function(index){
+                        $.post(
+                          "{:url('Admin/adminDel')}",
+                          {admin_id:admin_id},
+                          function(res){
+                            layer.msg(res.font,{icon:res.code,time:2000},function(){
+                              location.href ="{:url('Admin/adminList')}";                            
+                            });
+                          },
+                          'json'
+                        )                   
+                        layer.close(index);  //弹出窗关闭
+                      });     
+                    }else if(_event == 'edit'){
+                          location.href = "{:url('Admin/adminUpdate')}?admin_id="+admin_id;
+                    }
+                  });
+          });
+     });
+    </script>

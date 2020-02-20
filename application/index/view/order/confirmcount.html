@@ -1,0 +1,263 @@
+<script type="text/javascript" src="__STATIC__/index/js/n_nav.js"></script>
+{include file="public/nav" /}
+    <div class="content mar_20">
+    	<img src="__STATIC__/index/images/img2.jpg" />
+    </div>
+
+    <!--Begin 第二步：确认订单信息 Begin -->
+    <div class="content mar_20">
+    	<div class="two_bg">
+            <!--商品信息开始-->
+        	<div class="two_t">
+            	<span class="fr"><a href="#">修改</a></span>商品列表
+            </div>
+                <table border="0" class="car_tab" style="width:1110px;" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td class="car_th" width="550">商品名称</td>
+                        <td class="car_th" width="140">单价</td>
+                        <td class="car_th" width="150">购买数量</td>
+                        <td class="car_th" width="130">小计</td>
+                        <td class="car_th" width="140">返还积分</td>
+                    </tr>
+            {if condition ="$goodsInfo neq ''"}
+                {volist name="goodsInfo" id="v"}
+                    <tr goods_id ="{$v.goods_id}" class="goods_id">
+                        <td>
+                            <div class="c_s_img" style="margin-right:100px;">
+                                <img src="__STATIC__/../uploads/goodsimgs/{$v.goods_img}" width="73" height="73" />
+                            </div>
+                            <b style="line-height:70px;">{$v.goods_name}</b>
+                        </td>
+                        <td align="center" >
+                            <span style="text-decoration: line-through;color: green;font-weight: bold;">￥{$v.market_price}</span><br>
+                            ￥<span style="color:black;font-weight: bold;">{$v.self_price}</span>
+                        </td>
+                        <td align="center">{$v.buy_number}</td>
+                        <td align="center" style="color:#ff4e00;">￥{$v['self_price']*$v['buy_number']}</td>
+                        <td align="center">{$v.goods_score}R</td>
+                    </tr>
+                {/volist}
+             {else /}
+                    <tr>
+                        <td colspan="5" align="center">商品空空如也哦</td>
+                    </tr>
+             {/if}
+                    <tr>
+                        <td colspan="5" align="right" style="font-family:'Microsoft YaHei';">
+                            商品总价：￥{$count}； 返还积分 {$score}R
+                        </td>
+                    </tr>
+                </table>
+            <!--商品信息结束-->
+
+            <!--收货人地址开始-->
+            <div class="two_t">
+            	<span class="fr"><a href="javascript:;" id="addressUpd">修改</a></span>收货人信息
+            </div>
+            <div style="border: 1px solid green;overflow-y:auto;height: 200px;" class="table">
+                {volist name="addressInfo" id="v"}
+                {if condition="$v['is_default'] eq 1"}
+                <div>
+                    <div style="float: left;margin-left:10px;" address_id="{$v['address_id']}">
+                        <input type="radio" class="is_default" checked style="width: 15px;height: 20px;">
+                    </div>
+                    <div style="width:1110px;margin-top:15px;mrgin-left:20px;border:2px dotted red; " class="table">
+                        <table border="0" class="peo_tab" style="width:1100px;" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td class="p_td" width="160">收货人姓名</td>
+                                <td width="395">{$v.address_name}</td>
+                                <td class="p_td" width="160">联系方式</td>
+                                <td width="395">{$v.address_tel}</td>
+                            </tr>
+                            <tr>
+                                <td class="p_td">详细信息</td>
+                                <td>{$v.province}{$v.city}{$v.area}{$v.address_add}</td>
+                                <td class="p_td">邮政编码</td>
+                                <td>{$v.address_mail}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {else /}
+                <div>
+                    <div style="float: left;margin-left:10px;" address_id="{$v['address_id']}">
+                        <input type="radio" class="is_default" style="width: 15px;height: 20px;">
+                    </div>
+                    <div style="width:1110px;margin-top:15px;mrgin-left:20px;" class="table">
+                        <table border="0" class="peo_tab" style="width:1100px;" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td class="p_td" width="160">收货人姓名</td>
+                                <td width="395">{$v.address_name}</td>
+                                <td class="p_td" width="160">联系方式</td>
+                                <td width="395">{$v.address_tel}</td>
+                            </tr>
+                            <tr>
+                                <td class="p_td">详细信息</td>
+                                <td>{$v.province}{$v.city}{$v.area}{$v.address_add}</td>
+                                <td class="p_td">邮政编码</td>
+                                <td>{$v.address_mail}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {/if}
+                {/volist}
+            </div>
+            <!--收货地址结束-->
+            <div class="two_t">
+            	支付方式
+            </div>
+                <ul class="pay">
+                    <li class="checked" pay_type="1">余额支付<div class="ch_img"></div></li>
+                    <li pay_type="2">货到付款<div class="ch_img"></div></li>
+                    <li pay_type="3">支付宝<div class="ch_img"></div></li>
+                </ul>
+            
+            <div class="two_t">
+            	其他信息
+            </div>
+                <table border="0" class="car_tab" style="width:1110px;" cellspacing="0" cellpadding="0">
+                    <tr valign="top">
+                        <td align="right" style="padding-right:0;"><b style="font-size:14px;">订单附言：</b></td>
+                        <td style="padding-left:0;"><textarea class="add_txt" style="width:860px; height:50px;"></textarea></td>
+                    </tr>
+                </table>
+
+                <table border="0" style="width:900px; margin-top:20px;" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="right">
+                        该订单完成后，您将获得 <font color="#ff4e00">{$score}</font> 积分,
+                        商品总价: <font color="#ff4e00">￥{$count}</font>
+                    </td>
+                </tr>
+                <tr height="70">
+                    <td align="right">
+                        <b style="font-size:14px;">应付款金额：<span style="font-size:22px; color:#ff4e00;">￥{$count}</span></b>
+                    </td>
+                </tr>
+                <tr height="70">
+                    <td align="right">
+                        <a href="javascript:;" id="submitOrder">
+                            <img src="__STATIC__/index/images/btn_sure.gif" />
+                        </a>
+                    </td>
+                </tr>
+                </table>
+        </div>
+    </div>
+	<!--End 第二步：确认订单信息 End-->
+    <script>
+        $(function(){
+            layui.use('layer',function(){
+                var layer = layui.layer;
+                // 收货地址修改
+                $(document).on('click','#addressUpd',function(){
+                    // 获取收货地址
+                    var address_id = '';
+                    $(".is_default").each(function(){
+                        if($(this).prop('checked') == true){
+                            address_id = $(this).parent().attr('address_id');
+                        }
+                    });
+                    if(address_id == ''){
+                        layer.msg('选择收货地址后，才能提交订单哦',{icon:5});
+                        return false;
+                    }else{
+                        location.href="{:url('Address/addressUpd')}?address_id="+address_id;
+                    }
+                });
+
+                // 收货地址单选
+                $(document).on('click','.is_default',function(){
+                    var _this = $(this);
+                    // 点击当前时，其他的单选不默认
+                    _this.parent().parent().siblings().find(":input[class='is_default']").prop('checked',false);
+                    // 当前的div变颜色
+                    _this.parent().next("div[class='table']").css('border','2px dotted red');
+                    // 其他的div清除颜色
+                    _this.parent().parent().siblings().find("div[class='table']").css('border','none');
+                });
+
+                // 支付方式
+                $('.pay').children().click(function(){
+                    var _this = $(this);
+                    _this.addClass('checked');
+                    _this.siblings().removeClass('checked');
+                });
+
+                // 确认订单
+                $('#submitOrder').click(function(){
+                    if(checkLogin()){
+                        // 获取商品ID
+                        var _tr = $(".goods_id");
+                        var goods_id = '';
+                        _tr.each(function(index){
+                            goods_id +=$(this).attr('goods_id')+',';
+                        });
+                        if(goods_id == ''){
+                            layer.msg('添加商品后，才能提交订单哦',{icon:5});
+                            return false;
+                        }
+                        goods_id = goods_id.substr(0,goods_id.length-1);
+
+                        // 获取收货地址
+                        var address_id = '';
+                            $(".is_default").each(function(){
+                                if($(this).prop('checked') == true){
+                                    address_id = $(this).parent().attr('address_id');
+                                }
+                            });
+                        if(address_id == ''){
+                            layer.msg('选择收货地址后，才能提交订单哦',{icon:5});
+                            return false;
+                        }
+                        // console.log(address_id);
+
+                        // 获取支付方式
+                        var pay_type = $(".checked").attr('pay_type');
+                        // console.log(pay_type);
+
+                        // 获取订单留言
+                        var content = $(".add_txt").val();
+                        // console.log(content);
+
+                        $.post(
+                            "{:url('Order/submitOrder')}",
+                            {goods_id:goods_id,address_id:address_id,pay_type:pay_type,content:content},
+                            function(res){
+                                if(res.code == 6){
+                                    layer.msg(res.font,{icon:res.code},function(){
+                                        location.href = "{:url('Order/submitOrderdSuccess')}";
+                                    });
+                                }else{
+                                    layer.msg(res.font,{icon:res.code});
+                                }
+                            },
+                            'json'
+                        );
+                    }else{
+                       layer.msg('登陆后才能操作哦',{icon:5});
+                       return false;
+                    }
+
+                });
+
+            });
+            // 检查是否登录
+            function checkLogin(){
+                var status;
+                $.ajax({
+                    type:'post',
+                    url:"{:url('Order/checkLogin')}",
+                    async:false,
+                    dataType:'json',
+                    success:function(res){
+                        status = res.status;
+                    }
+                });
+                return status;
+            }
+        });
+    </script>
+
+

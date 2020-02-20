@@ -1,0 +1,19 @@
+<!--商品信息 start-->
+    <ul class="cate_list">
+        {volist name="goodsInfo" id="v"}
+        <li>
+            <div class="img"><a href="{:url('Goods/goodsDetail')}?goods_id={$v['goods_id']}"><img src="__STATIC__/../uploads/goodsimgs/{$v.goods_img}" width="210" height="185" /></a></div>
+            <div class="price">
+                <font>￥<span>{$v.self_price}</span></font> &nbsp; {$v.goods_score}R
+            </div>
+            <div class="name"><a href="{:url('Goods/goodsDetail')}?goods_id={$v['goods_id']}">{$v.goods_name}</a></div>
+            <div class="carbg">
+                <a href="javascript:;" class="ss">收藏</a>
+                <a href="javascript:;" class="j_car">加入购物车</a>
+            </div>
+        </li>
+        {/volist}
+    </ul>
+    <div class="pages">
+        {$str}
+    </div>

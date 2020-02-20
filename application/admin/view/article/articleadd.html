@@ -1,0 +1,96 @@
+<div style="width:600px;padding: 15px;">
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+      <label class="layui-form-label">文章标题</label>
+      <div class="layui-input-block">
+        <input type="text" name="article_title" required  lay-verify="required|checkName" placeholder="请输入标题" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">文章内容</label>
+      <div class="layui-input-block">
+        <textarea name="article_desc" lay-verify="required" placeholder="请输入内容" class="layui-textarea"></textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否展示</label>
+        <div class="layui-input-block">
+          <input type="radio" name="article_shop" value="1" title="是">
+          <input type="radio" name="article_shop" value="2" title="否" checked>
+        </div>
+      </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+</div>
+  <script>
+    $(function(){
+      //Demo
+      layui.use(['form','layer'], function(){
+        var form = layui.form;
+        var layer = layui.layer;
+        
+        form.verify({
+          // 验证标题
+          checkName:function(value,item){
+            var reg = /^[a-z]{6,}$/i;
+            if(!reg.test(value)){
+              return '文章标题字母组成6位以上';
+            }else{
+              var name_flag;
+
+              $.ajax({
+                type:'post',
+                url:"{:url('Article/checkName')}",
+                data:{article_title:value},
+                async:false
+              }).done(function(res){
+                // console.log(res);
+                if(res == 'no'){
+                  name_flag = '文章标题已存在';
+                }else{
+                  name_flag = '';
+                }
+              });
+
+              if(name_flag != ''){
+                return name_flag;
+              }
+            }
+          }
+        })
+        
+
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+          // layer.msg(JSON.stringify(data.field));
+          $.post(
+            "{:url('Article/articleAdd')}",
+            data.field,
+            function(res){
+              // console.log(res);
+              layer.msg(res.font,{icon:res.code,time:2000},function(){
+                layer.confirm('请选择操作内容', {
+                btn: ['继续添加', '查看展示'] //可以无限个按钮
+              }, function(index, layero){
+                //按钮【按钮一】的回调
+                window.location.href = "{:url('Article/ArticleAdd')}";
+              }, function(index){
+                //按钮【按钮二】的回调
+                window.location.href = "{:url('Article/ArticleList')}";
+              });
+ 
+              });
+            },
+            'json'
+          )
+          return false;
+        });
+      });
+    });
+  
+  </script>

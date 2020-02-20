@@ -1,0 +1,150 @@
+<div style="padding: 15px;">
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>分类id</th>
+                <th>分类名称</th>
+                <th>是否展示</th>
+                <th>是否在导航栏展示</th>
+                <th>操作</th>
+            </tr> 
+        </thead>
+        <tbody id="show">
+            {volist name="arr" id="v"}
+            <tr cate_id="{:$v['cate_id']}" pid="{:$v['pid']}" style="display:none;">
+                <td>
+                    {:str_repeat('&nbsp;&nbsp;',$v['level']*3)}
+                    <a href="javascript:;" class="snig" style="font-size:20px;color:red;">+</a>
+                    {$v.cate_id}
+                </td>
+                <td>
+                    {:str_repeat('&nbsp;&nbsp;',$v['level']*3)}
+                    <span class="cate_name_span" style="color:greenyellow;">{$v.cate_name}</span>
+                    <input type="hidden" field="cate_name" class="cate_name_input" value="{$v.cate_name}">
+                </td>
+                <td class="cate_show" field="cate_show" style="cursor:pointer;color:red;font-size:20px;">{$v.cate_show}</td>
+                <td class="cate_show" field="cate_navshow" style="cursor:pointer;color:red;font-size:20px;">{$v.cate_navshow}</td>
+                <td>
+                    <a href="{:url('Category/categoryDel')}?id={$v.cate_id}" style="color:blue">删除</a>
+                    <a href="{:url('Category/categoryUpd')}?id={$v.cate_id}" style="color:blue">修改</a>
+                </td>
+            </tr>
+            {/volist}
+        </tbody>
+      </table>
+</div>
+<script>
+    $(function(){
+        layui.use(['form','layer'],function(){
+            var form = layui.form;
+            var layer = layui.layer;
+            // 页面一加载就展示顶级分类
+            $('#show').children('tr[pid=0]').show();
+
+            // 给符号绑定点击事件
+            $(document).on('click','.snig',function(){
+                // 获取符号的值
+                var snig = $(this).text();
+                // console.log(snig);
+
+                // 当前分类的id
+                var cate_id = $(this).parents('tr').attr('cate_id');
+                // console.log(cate_id);
+                if(snig == '+'){
+                    var _children = $("#show").children('tr[pid='+cate_id+']');
+                    if(_children.length > 0){
+                        // 当前分类下的子类展示
+                        _children.show();
+
+                        // 当前符号变为－
+                        $(this).text('-');
+                    }else{
+                        layer.msg('该分类下没有子类',{icon:5});
+                    }
+                }else{ 
+                    // 当前符号变为+
+                    $(this).text('+');
+
+                    // 当前分类下的子类隐藏
+                    trHide(cate_id);
+                }
+            })
+
+            function trHide(cate_id){
+                var _tr = $("#show").children('tr[pid='+cate_id+']');
+                _tr.each(function(index){
+                    var c_id = $(this).attr('cate_id');
+                    trHide(c_id);             
+                });
+                _tr.hide();
+                _tr.find("a[class='snig']").text('+');
+            }
+
+            // 分类名称即点即改
+            $(document).on('click','.cate_name_span',function(){
+                $(this).hide();
+                $(this).next().prop('type','text');
+            });
+
+            $(document).on('blur','.cate_name_input',function(){
+                $(this).prev().show();
+                $(this).prop('type','hidden');
+                var value = $(this).val();
+                var field = $(this).attr('field');
+                var cate_id = $(this).parents('tr').attr('cate_id');
+                $.post(
+                    "{:url('Category/categoryEdit')}",
+                    {value:value,field:field,cate_id:cate_id},
+                    function(res){
+                        // console.log(res);
+                        if(res.code == 5){
+                            layer.msg(res.font,{icon:res.code},function(){
+                                location.href = "{:url('Category/categoryList')}";
+                            });
+                        }else{
+                            layer.msg(res.font,{icon:res.code});
+                        }
+                    }
+                    ,'json'
+                );
+                $(this).prev().html(value);
+            })
+
+            // 是否展示和是否导航栏展示即点即改
+            $(document).on('click','.cate_show',function(){
+                var value = $(this).html();
+                var field = $(this).attr('field');
+                var cate_id = $(this).parents('tr').attr('cate_id');
+                // console.log(value);
+                // console.log(field);
+                // console.log(cate_id);
+                if(value == '√'){
+                    value=2;
+                }else{
+                    value=1;
+                }
+                $.post(
+                    "{:url('Category/categoryEdit')}",
+                    {value:value,field:field,cate_id:cate_id},
+                    function(res){
+                        // console.log(res);
+                        if(res.code == 5){
+                            layer.msg(res.font,{icon:res.code},function(){
+                                location.href = "{:url('Category/categoryList')}";
+                            });
+                        }else{
+                            layer.msg(res.font,{icon:res.code});
+                        }
+                    }
+                    ,'json'
+                );
+                if(value == 2){
+                    $(this).html('×');
+                }else{
+                    $(this).html('√');
+                }
+            })
+        });
+        
+    })
+</script>

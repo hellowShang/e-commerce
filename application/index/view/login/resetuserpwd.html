@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>密码重置</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="stylesheet" href="__STATIC__/index/login/amazeui.css" />
+    <link href="__STATIC__/index/login/dlstyle.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/layui/css/layui.css" rel="stylesheet" type="text/css">
+
+
+    <script src="__STATIC__/layui/layui.js"></script>
+    <script src="__STATIC__/index/login/jquery-3.2.1.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="login-boxtitle">
+    <a href="javascript:;"><img alt="logo" src="__STATIC__/index/login/logobig.png" /></a>
+</div>
+
+<div class="login-banner">
+    <div class="login-main">
+        <div class="login-banner-bg"><span></span><img src="__STATIC__/index/login/big.jpg" /></div>
+        <div class="login-box">
+
+            <h3 class="title" style="float: left;">密码重置</h3>
+
+            <div class="clear"></div>
+
+            <div class="login-form">
+                <form>
+                    <input type="hidden" id="user_id" value="{$userInfo.user_id}">
+                    <input type="password" id="pwd" placeholder="请填入密码">
+                    <input type="password" id="repwd" placeholder="请填入确认密码">
+                    <input type="button" value="确认" id="btn">
+                    <input type="reset" value="取消">
+                    <a href="{:url('Login/login')}">返回登录界面</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer ">
+    <div class="footer-hd ">
+        <p>
+            <a href="# ">恒望科技</a>
+            <b>|</b>
+            <a href="# ">商城首页</a>
+            <b>|</b>
+            <a href="# ">支付宝</a>
+            <b>|</b>
+            <a href="# ">物流</a>
+        </p>
+    </div>
+    <div class="footer-bd ">
+        <p>
+            <a href="# ">关于恒望</a>
+            <a href="# ">合作伙伴</a>
+            <a href="# ">联系我们</a>
+            <a href="# ">网站地图</a>
+            <em>© 2015-2025 Hengwang.com 版权所有. 更多模板 <a href="#" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a></em>
+        </p>
+    </div>
+</div>
+</body>
+
+</html>
+<script>
+
+
+    $(function(){
+        layui.use('layer',function(){
+            var layer = layui.layer;
+            // 密码验证
+            $("#pwd").blur(function(){
+                pwd = $("#pwd").val();
+                var reg = /^\w{6,12}$/;
+                if(pwd == ''){
+                    layer.msg('密码必填',{icon:5});
+                    return false;
+                }else if(!reg.test(pwd)){
+                    layer.msg('密码由字母、数字、下划线组成6-12位',{icon:5});
+                    return false;
+                }
+            });
+
+            // 确认密码验证
+            $("#repwd").blur(function(){
+                var repwd = $("#repwd").val();
+                if(repwd == ''){
+                    layer.msg('确认密码必填',{icon:5});
+                    return false;
+                }else if(repwd != pwd){
+                    layer.msg('两次密码输入不一致',{icon:5});
+                    return false;
+                }
+            });
+
+
+            // 提交传值
+            $("#btn").click(function(){
+                var user_id = $("#user_id").val();
+                $.post(
+                    "{:url('Login/resetUserPwd')}",
+                    {pwd:pwd,user_id:user_id},
+                    function (res) {
+                        // console.log(res);
+                        layer.msg(res.font,{icon:res.code});
+                    },
+                    'json'
+                );
+            });
+
+        });
+    });
+</script>

@@ -1,0 +1,224 @@
+<div style="padding: 15px;">
+
+        <form class="layui-form" action="">
+          <input type="hidden" name="goods_id" id="goods_id" value="{$goodsInfo.goods_id}">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">商品名称</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="goods_name" required  lay-verify="required|checkName" value="{$goodsInfo.goods_name}" placeholder="请输入商品名" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">本店售价</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="self_price" required lay-verify="required|number" value="{$goodsInfo.self_price}" placeholder="￥" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">市场售价</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="market_price" required lay-verify="required|number" value="{$goodsInfo.market_price}" placeholder="￥" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">是否上架</label>
+                  <div class="layui-input-block">
+                    {if condition="$goodsInfo['is_up'] eq '√'"}
+                    <input type="radio" name="is_up" value="1" title="是" checked>
+                    <input type="radio" name="is_up" value="2" title="否">
+                    {else /}
+                    <input type="radio" name="is_up" value="1" title="是">
+                    <input type="radio" name="is_up" value="2" title="否" checked>
+                    {/if}
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">请选择</label>
+                  <div class="layui-input-block">
+                    <input type="checkbox" name="is_new" title="新品"  value="1" {if condition="$goodsInfo['is_new'] eq '√'"} checked {/if}>
+                    <input type="checkbox" name="is_best" title="精品" value="1" {if condition="$goodsInfo['is_best'] eq '√'"} checked {/if}>
+                    <input type="checkbox" name="is_hot" title="热卖" value="1" {if condition="$goodsInfo['is_hot'] eq '√'"} checked {/if}>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">库存</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="goods_num" required lay-verify="required|number" value="{$goodsInfo.goods_num}" placeholder="剩余库存" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">赠送积分</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="goods_score" required lay-verify="required|nember" value="{$goodsInfo.goods_score}" placeholder="积分数" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">商品图片</label>
+                  <input type="hidden" name="goods_img" value="{$goodsInfo.goods_img}" id="goods_img">
+                  <button type="button" class="layui-btn layui-btn-danger" id="img"><i class="layui-icon"></i>上传图片</button>
+                  <div class="layui-input-inline">
+                  </div>
+                </div>
+                <div style="margin-left:200px;" id="img_div">
+                    <img src="__STATIC__/../uploads/goodsimgs/{$goodsInfo.goods_img}" width="50px" height="50px" id=>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">商品轮播图</label>
+                  <input type="hidden" name="old_goods_imgs" value="{$goodsInfo.goods_imgs}" id="old_goods_imgs">
+                  <input type="hidden" name="goods_imgs" value="" id="goods_imgs">
+                  <button type="button" class="layui-btn layui-btn-danger" id="imgs"><i class="layui-icon"></i>上传图片</button>
+                  <div class="layui-input-inline">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">商品详情</label>
+                    <div class="layui-input-block">
+                     <textarea name="goods_desc" id="goods_desc" cols="0" rows="0">{$goodsInfo.goods_desc}</textarea>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">品牌</label>
+                      <div class="layui-input-inline">
+                        <select name="brand_id">
+                        {volist name="brandInfo" id="v"}
+                        {if condition="$goodsInfo['brand_id'] eq $v['brand_id']"}
+                          <option value="{$v.brand_id}" selected>{$v.brand_name}</option>
+                        {else /}
+                          <option value="{$v.brand_id}">{$v.brand_name}</option>
+                        {/if}
+                        {/volist}
+                      </select>
+                      </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类</label>
+                        <div class="layui-input-inline">
+                          <select name="cate_id">
+                          {volist name="cateInfo" id="v"}
+                          {if condition="$goodsInfo['cate_id'] eq $v['cate_id']"}
+                            <option value="{$v.cate_id}" selected>{:str_repeat("&nbsp;&nbsp;",$v['level']*2)}{$v.cate_name}</option>
+                          {else /}
+                            <option value="{$v.cate_id}">{:str_repeat("&nbsp;&nbsp;",$v['level']*2)}{$v.cate_name}</option>
+                          {/if}
+                          {/volist}
+                          </select>
+                        </div>
+                      </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+              </form>
+               
+              <script>
+              $(function(){
+                  layui.use(['form','upload','layer','layedit'], function(){
+                  var form = layui.form;
+                  var upload = layui.upload;
+                  var layer = layui.layer;
+                  var layedit = layui.layedit;
+                  
+                  // 验证
+                  form.verify({
+                    checkName:function(value,item){
+                      var reg =  /^([\u4e00-\u9fa5]|[\w\-]){1,17}$/;
+                      if(!reg.test(value)){
+                          return '商品名称字母、汉字2-17位组成';
+                      }else{
+                        var flag;
+                        $.ajax({
+                          type:'post'
+                          ,url:"{:url('Goods/checkName')}"
+                          ,data:{goods_name:value,type:2,goods_id:$("#goods_id").val()}
+                          ,async:false
+                        }).done(function(res){
+                            if(res == 'no'){
+                              flag = '商品名称已存在';
+                            }else{
+                              flag = '';
+                            }
+                        });
+                        if(flag != ''){
+                          return flag;
+                        }
+                      }
+                    }
+                  });
+
+                  // 富文本编辑器
+                  layedit.set({
+                    uploadImage: {
+                      url: "{:url('Goods/goodsEditUpload')}" //接口url
+                    }
+                  });
+                  var _index = layedit.build('goods_desc'); //建立编辑器
+
+                  // 商品图片上传
+                  upload.render({
+                    elem: '#img' //绑定元素
+                    ,url: "{:url('Goods/goodsImgUpload')}" //上传接口
+                    ,size: 1024
+                    ,done: function(res){
+                      // console.log(res);
+                      layer.msg(res.font,{icon:res.code},function(){
+                        $('#goods_img').val(res.src);
+                        $('#img_div').children().prop('src','__STATIC__/../uploads/goodsimgs/'+res.src);
+                        // console.log($('#img').prop('src'));
+                      })
+                    //上传完毕回调
+                    }
+                    ,error: function(){
+                    //请求异常回调
+                    }
+                  });
+
+                  // 商品相册上传
+                  upload.render({
+                    elem: '#imgs' //绑定元素
+                    ,url: "{:url('Goods/goodsImgUpload')}" //上传接口
+                    ,size: 1024
+                    ,multiple: true
+                    ,number: 3
+                    ,done: function(res){
+                      // console.log(res);
+                      layer.msg(res.font,{icon:res.code},function(){
+                        var _src = $('#goods_imgs').val();
+                        var new_src =_src+res.src+'|';
+                        $('#goods_imgs').val(new_src);
+                      })
+                    //上传完毕回调
+                    }
+                    ,error: function(){
+                    //请求异常回调
+                    }
+                  });
+
+                  //监听提交
+                  form.on('submit(formDemo)', function(data){
+                    // console.log(layedit.getContent(_index));
+                    data.field.goods_desc = layedit.getContent(_index);
+                    $.post(
+                        "{:url('Goods/goodsUpdDo')}"
+                        ,data.field
+                        ,function(res){
+                          // console.log(res);
+                          if(res.code == 5){
+                            layer.msg(res.font,{icon:res.code});
+                          }else{
+                            layer.msg(res.font,{icon:res.code},function(){
+                              location.href = "{:url('Goods/goodsList')}";
+                            });
+                          
+                            }
+                        }
+                        ,'json'
+                    );
+                    return false;
+                  });
+                });
+              });
+              
+              </script>
+    </div>

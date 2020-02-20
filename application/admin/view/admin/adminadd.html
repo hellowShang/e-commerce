@@ -1,0 +1,124 @@
+<div style="padding: 15px;width:600px;">
+        <form class="layui-form" action="">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">管理员名称</label>
+                  <div class="layui-input-block">
+                    <input type="text" name="admin_name"  lay-verify="required|checkName" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">密码</label>
+                  <div class="layui-input-block">
+                    <input type="password" name="admin_pwd" lay-verify="required|checkPwd" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="admin_email"  lay-verify="required|email"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">电话</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="admin_tel"  lay-verify="required|phone|number"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+              </form>
+               
+              <script>
+          $(function(){
+            layui.use(['form','layer'], function(){
+            var form = layui.form;
+            var layer = layui.layer;
+
+              // 验证
+              form.verify({
+                // 用户名
+                checkName: function(value, item){ //value：表单的值、item：表单的DOM对象
+                    var reg = /^[a-z_]\w{3,11}$/i;
+                    if(!reg.test(value)){
+                      return '管理员名称数字、字母、下划线非数字开头4-12位';
+                    }else{
+                        var name_flag;
+                        // 第一步
+                        $.ajax({
+                          type:'POST',
+                          url:"{:url('Admin/checkName')}",
+                          data:{admin_name:value,type:1},
+                          async:false
+                        }).done(function(result){
+                          // console.log(result);
+                            if(result == 'no'){
+                              name_flag = '管理员名称已存在';
+                            }else{
+                              name_flag ='';
+                            }
+                        })
+
+                        // 第二步
+                        if(name_flag != ''){
+                          return name_flag;
+                        }
+                      }
+                  },
+
+                // 密码
+                checkPwd: function(value, item){ //value：表单的值、item：表单的DOM对象
+                    var reg = /^.{6,12}$/i;
+                    if(!reg.test(value)){
+                      return '密码6-12位';
+                    }
+                }
+              })
+
+                // 获取表单数据
+                
+                form.on('submit(formDemo)', function(data){
+                  // console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+                  $.post(
+                    "{:url('Admin/adminAdd')}",
+                    data.field,
+                    function(res){
+                      // console.log(res);
+                      if(res.code == 5){
+                        layer.msg(res.font, {icon: res.code}); 
+                      }else{
+                        layer.open({
+                          content: '请选择操作的内容',   //框内容
+                          btn: ['继续添加', '前往列表展示'],
+                          yes: function(index, layero){
+                            //按钮【按钮一】的回调
+                          window.location.href="{:url('Admin/adminAdd')}";
+                          },
+                          btn2: function(index, layero){
+                            //按钮【按钮二】的回调
+                            window.location.href="{:url('Admin/adminList')}";
+                            //return false 开启该代码可禁止点击该按钮关闭
+                          },
+                          cancel: function(){ 
+                            //右上角关闭回调
+                            
+                            //return false 开启该代码可禁止点击该按钮关闭
+                          }
+                        });
+                      }
+                    },
+                    'json'
+                  )
+                  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                });
+
+              });
+
+            });
+              
+              </script>
+    </div>
+

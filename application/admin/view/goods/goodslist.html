@@ -1,0 +1,171 @@
+<div style="padding: 15px;">
+    <form class="layui-form" onsubmit="return false">
+        <div style="float:left;margin-left:10px; margin-bottom:20px;">
+            <div class="layui-input-block" style="width:200px;float:left;padding: 0px;margin:0px;">
+                <input type="text" id="goods_name" placeholder="请输入商品名称的关键字" autocomplete="off" class="layui-input">
+            </div>
+            <div style="float:left;margin-left:10px;">
+                <label>分类</label>&nbsp;&nbsp;
+                <div class="layui-input-inline">
+                  <select id="cate_id">
+                    <option value="">--请选择--</option>
+                  {volist name="cateInfo" id="v"}
+                    <option value="{$v.cate_id}">{:str_repeat("&nbsp;&nbsp;",$v['level']*2)}{$v.cate_name}</option>
+                  {/volist}
+                  </select>
+                </div>
+              </div>
+              <div style="float:left;margin-left:10px;">
+                <label>品牌</label>&nbsp;&nbsp;
+                <div class="layui-input-inline">
+                  <select id="brand_name">
+                    <option value="">--请选择--</option>
+                  {volist name="brandInfo" id="v"}
+                    <option value="{$v.brand_name}">{$v.brand_name}</option>
+                  {/volist}
+                  </select>
+                </div>
+              </div>
+              <div style="float:left;margin-left:10px;">
+                <label>是否上架</label>&nbsp;&nbsp;
+                <div class="layui-input-inline">
+                  <select id="is_up">
+                    <option value="">--请选择--</option>
+                    <option value="1">已上架</option>
+                    <option value="2">已下架</option>
+                  </select>
+                </div>
+              </div>
+            <div class="layui-input-block" style="float:left;padding: 0px;margin:0px 0px 0px 20px;">
+                    <button class="layui-btn" lay-submit  id="sear">搜索</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- 表格 -->
+    <div style="clear:both;"><table class="layui-hide" id="demo" lay-filter="test"></table></div>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    $(function(){
+        function demo(){
+            return false;
+        }
+        layui.use(['form','table','layer'],function(){
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+
+            // 表格展示
+            table.render({
+                elem: '#demo'
+                ,url: "{:url('Goods/getGoodsInfo')}" //数据接口
+                ,page: true //开启分页
+                ,limit:5
+                ,limits:[3,5,10]
+                ,cols: [[ //表头
+                {field: 'goods_id', title: 'ID', width:50, fixed: 'left'}
+                ,{field: 'goods_name', title: '商品名称',edit:'text'}
+                ,{field: 'self_price', title: '本店售价',edit:'text'}
+                ,{field: 'goods_num', title: '库存',edit:'text'} 
+                ,{field: 'goods_score', title: '赠送积分',edit:'text'}
+                ,{field: 'is_up', title: '上架',templet: function(d){
+                        return "<font color='green' size='5px'>"+d.is_up+"</font>";
+                    }}
+                ,{field: 'is_new', title: '新品',templet: function(d){
+                        return "<font color='green' size='5px'>"+d.is_new+"</font>";
+                    }}
+                ,{field: 'is_best', title: '精品',templet: function(d){
+                        return "<font color='green' size='5px'>"+d.is_best+"</font>";
+                    }}
+                ,{field: 'is_hot', title: '热卖',templet: function(d){
+                        return "<font color='green' size='5px'>"+d.is_hot+"</font>";
+                    }}
+                ,{field: 'cate_name', title: '分类名称',}
+                ,{field: 'brand_name', title: '品牌名称',}
+                ,{field: 'barDemo', title: '操作',toolbar: '#barDemo',align:'center'}
+                ]]
+            });
+                
+            // 搜索
+            $(document).on('click','#sear',function(){
+                
+                var goods_name = $('#goods_name').val();
+                var cate_id = $('#cate_id').val();
+                var brand_name = $('#brand_name').val();
+                var is_up = $('#is_up').val();
+                // console.log(goods_name);
+                // console.log(cate_id);
+                // console.log(brand_name);
+                // console.log(is_up);
+                if(goods_name == '' &&cate_id == '' &&brand_name == ''&&is_up== ''){
+                    layer.msg('搜索内容不能为空',{icon:5});
+                    return false;
+                }
+                table.reload('demo', {
+                    where: { //设定异步数据接口的额外参数，任意设
+                        goods_name:goods_name,
+                        cate_id:cate_id,
+                        brand_name:brand_name,
+                        is_up:is_up
+                    //…
+                    }
+                    ,page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            
+            //监听单元格编辑
+            table.on('edit(test)', function(obj){
+                var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+                // console.log(value);
+                // console.log(brand_id);
+                // console.log(field);
+                $.post(
+                    "{:url('Goods/goodsEdit')}",
+                    {value:value,goods_id:data.goods_id,field:field},
+                    function(res){
+                        // console.log(res);
+                        layer.msg(res.font,{icon:res.code,time:2000},function(){
+                            table.reload('demo');
+                        });
+                    },
+                    'json'
+                );
+            });
+        
+            //监听行工具事件
+            table.on('tool(test)', function(obj){
+                var _event = obj.event;
+                // console.log(obj);
+                // console.log(_event);
+                if(_event == 'del'){
+                    layer.confirm('真的要删除么', function(index){
+                        $.post(
+                            "{:url('Goods/goodsDel')}",
+                            {goods_id:obj.data.goods_id},
+                            function(res){
+                                // console.log(res);
+                                layer.msg(res.font,{icon:res.code,time:2000},function(index){
+                                    location.href = "{:url('Goods/goodsList')}";
+                                });
+                            },
+                            'json'
+                        )
+                    });
+                   
+                }else if(_event === 'edit'){
+                    location.href = "{:url('Goods/goodsUpd')}?goods_id="+obj.data.goods_id;
+                }
+
+                
+            });
+        });
+    });
+</script>
